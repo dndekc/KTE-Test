@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тестування КТЕ</title>
+<style>
+  :root {
+    --bg: #0f1720;
+    --panel: #16212e;
+    --panel-2: #1c2b3a;
+    --border: #26394a;
+    --teal: #7fd3c7;
+    --teal-dim: #3f6e66;
+    --text: #e8edf1;
+    --text-dim: #93a5b3;
+    --danger: #e2694f;
+    --ok: #6fcf97;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    min-height: 100%;
+  }
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 28px 18px 60px;
+  }
+  .top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 14px;
+  }
+  .top h1 {
+    font-size: 17px;
+    letter-spacing: 0.5px;
+    margin: 0;
+    color: var(--text);
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .top .mono {
+    font-family: 'SFMono-Regular', Consolas, 'Courier New', monospace;
+    font-size: 13px;
+    color: var(--teal);
+    letter-spacing: 1px;
+  }
+
+  /* --- intro screen --- */
+  .intro {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 32px 28px;
+    text-align: center;
+  }
+  .intro .big-num {
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: 54px;
+    font-weight: 700;
+    color: var(--teal);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .intro .big-label {
+    color: var(--text-dim);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 22px;
+  }
+  .intro p {
+    color: var(--text-dim);
+    font-size: 14.5px;
+    line-height: 1.6;
+    max-width: 460px;
+    margin: 0 auto 26px;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--teal);
+    color: #0f1720;
+    font-weight: 700;
+    font-size: 15px;
+    border: none;
+    border-radius: 7px;
+    padding: 13px 34px;
+    cursor: pointer;
+    transition: transform 0.12s ease, background 0.12s ease;
+  }
+  .btn:hover { background: #97ded3; transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--teal);
+    border: 1.5px solid var(--teal-dim);
+  }
+  .btn.secondary:hover { background: rgba(127,211,199,0.08); }
+
+  /* --- progress --- */
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+  .progress-track {
+    flex: 1;
+    height: 6px;
+    background: var(--panel-2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--teal);
+    border-radius: 4px;
+    transition: width 0.25s ease;
+  }
+  .progress-count {
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: 13px;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+
+  /* --- question card --- */
+  .qcard {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 26px 24px;
+    margin-bottom: 20px;
+  }
+  .qnum {
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    color: var(--teal-dim);
+    font-size: 13px;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+  }
+  .qtext {
+    font-size: 17px;
+    line-height: 1.5;
+    font-weight: 600;
+    margin-bottom: 22px;
+    white-space: pre-line;
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 15px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14.5px;
+    line-height: 1.45;
+    background: var(--panel-2);
+    transition: border-color 0.12s ease, background 0.12s ease;
+    white-space: pre-line;
+  }
+  .option:hover { border-color: var(--teal-dim); }
+  .option.selected {
+    border-color: var(--teal);
+    background: rgba(127,211,199,0.10);
+  }
+  .option .marker {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid var(--text-dim);
+    margin-top: 1px;
+  }
+  .option.selected .marker {
+    border-color: var(--teal);
+    background: var(--teal);
+    box-shadow: inset 0 0 0 3px var(--panel-2);
+  }
+
+  .nav-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  /* --- result screen --- */
+  .result {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 40px 28px;
+    text-align: center;
+  }
+  .result .score {
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    font-size: 64px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .result .score.ok { color: var(--ok); }
+  .result .score.mid { color: #e0b84f; }
+  .result .score.bad { color: var(--danger); }
+  .result .pct {
+    color: var(--text-dim);
+    font-size: 15px;
+    margin-bottom: 28px;
+  }
+  .result .verdict {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 30px;
+  }
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .hidden { display: none !important; }
+
+  footer {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 12px;
+    margin-top: 30px;
+    letter-spacing: 0.4px;
+  }
+
+  @media (max-width: 480px) {
+    .intro .big-num { font-size: 42px; }
+    .result .score { font-size: 50px; }
+    .qcard { padding: 20px 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <h1>Тестування · КТЕ</h1>
+    <div class="mono" id="topStatus">50 питань</div>
+  </div>
+
+  <!-- NAME -->
+  <div id="screenName" class="intro">
+    <div class="big-label" style="margin-bottom:14px;">Перед початком тестування</div>
+    <p style="margin-bottom:18px;">Введіть прізвище та ім'я, щоб зберегти результат тестування.</p>
+    <input type="text" id="nameInput" placeholder="Прізвище Ім'я" autocomplete="off"
+      style="width:100%; max-width:360px; padding:13px 16px; font-size:15px; border-radius:7px;
+      border:1.5px solid var(--border); background:var(--panel-2); color:var(--text);
+      margin-bottom:22px; outline:none; font-family:inherit;">
+    <div id="nameError" style="color:var(--danger); font-size:13px; margin:-14px 0 18px; display:none;">
+      Будь ласка, введіть прізвище та ім'я
+    </div>
+    <br>
+    <button class="btn" id="btnNameNext">Продовжити</button>
+  </div>
+
+  <!-- INTRO -->
+  <div id="screenIntro" class="intro hidden">
+    <div class="big-num">50</div>
+    <div class="big-label">випадкових питань з банку 100</div>
+    <p>
+      Кожна спроба — новий випадковий набір із 50 питань, а варіанти відповідей
+      перемішуються щоразу заново. Наприкінці буде показано лише підсумковий результат.
+    </p>
+    <button class="btn" id="btnStart">Почати тестування</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="screenQuiz" class="hidden">
+    <div class="progress-row">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-count" id="progressCount">1 / 50</div>
+      <div class="progress-count" id="skipCount" style="color:#e0b84f; display:none;"></div>
+      <div class="progress-count" id="timerDisplay" style="color:var(--teal);">30:00</div>
+    </div>
+
+    <div class="qcard">
+      <div class="qnum" id="qNum">ПИТАННЯ 1</div>
+      <div class="qtext" id="qText"></div>
+      <div class="options" id="qOptions"></div>
+    </div>
+
+    <div class="nav-row" style="justify-content: space-between;">
+      <button class="btn secondary" id="btnFinishEarly">Завершити тестування</button>
+      <div style="display:flex; gap:10px;">
+        <button class="btn secondary" id="btnSkip">Пропустити</button>
+        <button class="btn" id="btnNext" disabled>Далі</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="screenResult" class="hidden">
+    <div class="result">
+      <div class="pct" id="resName" style="font-size:14px; text-transform:uppercase; letter-spacing:1px; color:var(--teal);"></div>
+      <div class="score" id="resScore">0/50</div>
+      <div class="pct" id="resPct">0%</div>
+      <div class="verdict" id="resVerdict"></div>
+      <div class="btn-row">
+        <button class="btn" id="btnRestart">Пройти ще раз</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Тест генерується випадково з банку у 100 питань щоразу заново<br>
+    <a href="#" id="adminLink" style="color:var(--text-dim); text-decoration:underline; font-size:11.5px;">переглянути результати всіх учасників</a>
+  </footer>
+
+  <!-- ADMIN PASSWORD -->
+  <div id="screenAdminAuth" class="hidden intro">
+    <div class="big-label" style="margin-bottom:14px;">Доступ лише для адміністратора</div>
+    <p style="margin-bottom:18px;">Введіть пароль, щоб переглянути результати всіх учасників.</p>
+    <input type="password" id="adminPassInput" placeholder="Пароль" autocomplete="off"
+      style="width:100%; max-width:300px; padding:13px 16px; font-size:15px; border-radius:7px;
+      border:1.5px solid var(--border); background:var(--panel-2); color:var(--text);
+      margin-bottom:14px; outline:none; font-family:inherit;">
+    <div id="adminPassError" style="color:var(--danger); font-size:13px; margin:-4px 0 18px; display:none;">
+      Невірний пароль
+    </div>
+    <br>
+    <div class="btn-row">
+      <button class="btn secondary" id="adminAuthCancel">Скасувати</button>
+      <button class="btn" id="adminAuthSubmit">Увійти</button>
+    </div>
+  </div>
+
+  <!-- ADMIN -->
+  <div id="screenAdmin" class="hidden">
+    <div class="qcard">
+      <div class="qnum" style="display:flex; justify-content:space-between; align-items:center;">
+        <span>РЕЗУЛЬТАТИ ВСІХ УЧАСНИКІВ</span>
+        <a href="#" id="adminClose" style="color:var(--teal-dim); text-decoration:underline; font-size:12px; font-family:inherit; text-transform:none; letter-spacing:0;">закрити</a>
+      </div>
+      <div id="adminList" style="margin-top:16px; display:flex; flex-direction:column; gap:8px;"></div>
+      <div id="adminEmpty" class="hidden" style="color:var(--text-dim); font-size:14px; padding:10px 0;">Поки що немає жодного результату.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const BANK = [{"question": "За мінімальну одиницю вимірювання кількості інформації прийнятий…", "options": ["бод", "1 біт", "1 байт", "1 Кбайт"], "correctText": "1 біт"}, {"question": "Продуктивність роботи комп'ютера (швидкість виконання операцій) залежить від...", "options": ["розміру екрана дисплея", "частоти процесора", "напруги живлення", "швидкості натискання на клавіші"], "correctText": "частоти процесора"}, {"question": "Файл - це...", "options": ["одиниця виміру інформації", "програма в оперативній пам'яті", "текст, роздрукований на принтері", "програма або дані на диску"], "correctText": "програма або дані на диску"}, {"question": "Основним елементом бази даних є...", "options": ["поле", "форма", "таблиця", "запис"], "correctText": "поле"}, {"question": "Яка найменша область пам’яті на жорсткому диску?", "options": ["байт", "кілобайт", "сектор", "кластер"], "correctText": "сектор"}, {"question": "Яка максимальна кількість первинних (основних) розділів може існувати на жорсткому диску з MBR?", "options": ["1", "2", "4", "безліч"], "correctText": "4"}, {"question": "Для чого потрібне кодування символів?", "options": ["для того, щоб зловмисник не зміг прочитати інформацію", "для вірної інтерпретації цифрових даних у літери, цифри та символи та  \n     подальшої їх передачі", "для більшої стійкості паролю користувача", "для правильної роботи відеокарти"], "correctText": "для вірної інтерпретації цифрових даних у літери, цифри та символи та  \n     подальшої їх передачі"}, {"question": "Назвіть всі атрибути, які присвоюються файлам?", "options": ["архівний, прихований, системний", "прихований, системний, тільки для читання", "архівний, прихований, системний, тільки для читання", "прихований, тільки для читання"], "correctText": "архівний, прихований, системний, тільки для читання"}, {"question": "Файлова система – це:", "options": ["всі файли, що зберігаються на всіх інформаційних носіях", "всі підкаталоги кореневого каталогу", "розділ інформаційного носія, що використовується Linux для зберігання даних", "порядок, який визначає спосіб організації, зберігання та іменування файлів на носії інформації або його розділі"], "correctText": "порядок, який визначає спосіб організації, зберігання та іменування файлів на носії інформації або його розділі"}, {"question": ". Числове значення – 12, 16 або 32 – в назві файлової системи FAT відображає:", "options": ["розмір кластера на дискові", "розрядність (розмір) елемента в таблиці FAT", "допустима кількість символів в імені файлу", "максимальний об’єм файлу в байтах"], "correctText": "розрядність (розмір) елемента в таблиці FAT"}, {"question": "Які з цих файлових систем підтримуються операційними системами сімейства Windows?", "options": ["FAT, NTFS, HFS", "FAT, NTFS", "CDFS, UDF, FAT, NTFS, віддалені FS", "FAT32, NTFS, EXT4"], "correctText": "CDFS, UDF, FAT, NTFS, віддалені FS"}, {"question": "Які існують типи файлової системи FAT?", "options": ["FAT12, FAT16, FAT24, FAT32", "FAT8, FAT12, FAT16, FAT32, exFAT", "FAT16, FAT32, exFAT", "FAT8, FAT12, FAT16, FAT32"], "correctText": "FAT16, FAT32, exFAT"}, {"question": "Який з перерахованих рядків не може бути ім’ям файлу в ОС Linux?", "options": [".25T..", "{arch}", "year2001/April", "*May*"], "correctText": "year2001/April"}, {"question": "Які із символів (.), (/) та (\") в іменах файлів файлової системи ОС Linux заборонено використовувати?", "options": ["всі символи", "символи (.), (/) та (\")", "символи (/) та (.)", "тільки (/)"], "correctText": "тільки (/)"}, {"question": "В файловій системі ОС Linux:", "options": ["один кореневий каталог", "по одному кореневому каталогу на кожний диск", "не більш 15 кореневих каталогів", "не більш двох кореневих каталогів"], "correctText": "один кореневий каталог"}, {"question": "В ОС Linux «/home/methody/examples» – це:", "options": ["повний шлях", "відносний шлях", "домашній каталог", "кореневий каталог"], "correctText": "повний шлях"}, {"question": "В ОС Linux «../../share/doc/» – це:", "options": ["повний шлях", "відносний шлях", "поточний каталог", "ім’я файлу"], "correctText": "відносний шлях"}, {"question": "За допомогою якої команди Unix можна створити пустий файл?", "options": ["touch", "cp", "chmod", "mv"], "correctText": "touch"}, {"question": "Перерахуйте файли, з яких складається системний реєстр Windows:", "options": ["System, Software", "SAM, Security, System, Software, NTUSER.dat", "Security, System, Software, NTUSER.dat", "System, Software, NTUSER.dat"], "correctText": "SAM, Security, System, Software, NTUSER.dat"}, {"question": "Який з системних файлів файловій системі NTFS містить у собі файлову таблицю:", "options": ["$BitMap", "$LogFile", "$MFT", "$Volume"], "correctText": "$MFT"}, {"question": "Вкажіть, для чого використовуються команда «ping»?", "options": ["для діагностики DNS", "перевірка доступності хоста і всіх проміжних маршрутизаторів", "перевірка доступності хоста (комп'ютера), протокол ICMP", "консоль (командний рядок)."], "correctText": "перевірка доступності хоста (комп'ютера), протокол ICMP"}, {"question": "Яку мінімальну кількість дисків необхідно для створення RAID-масиву рівня RAID-1?", "options": ["3", "6", "2", "4"], "correctText": "2"}, {"question": "Яка максимальна швидкість з’єднання по 802.11g?", "options": ["40 Мбіт/с", "54 Кбіт/с", "100 Мбіт/с", "54 Мбіт/с"], "correctText": "54 Мбіт/с"}, {"question": "Основний принцип RAID – це:", "options": ["використання декількох недорогих дисків з метою економії витрат", "використання декількох дисків замість одного для створення копії інформації", "здешевлення й прискорення процесу обробки інформації", "використання декількох дисків замість одного для підвищення швидкості або надійності"], "correctText": "використання декількох дисків замість одного для підвищення швидкості або надійності"}, {"question": "У якому каталозі в операційній системі Windows 7 зберігаються файли реєстру:", "options": ["C:\\Windows\\system32\\config", "C:\\Users\\«папка користувача»\\", "C:\\Windows\\prefetch\\", "C:\\Windows\\winevt\\"], "correctText": "C:\\Windows\\system32\\config"}, {"question": "Вкажіть тип RAID-масиву, дані в якому записуються на кожен диск послідовно, визначеними блоками та мають блок парності?", "options": ["RAID 0", "RAID 1", "RAID 0+1", "RAID 5"], "correctText": "RAID 5"}, {"question": "Метадані – це:", "options": ["вміст файлу", "вміст каталогу", "дані, що описують інші дані", "велика кількість даних."], "correctText": "дані, що описують інші дані"}, {"question": "Яка інформація міститься у системному файлі $LogFile файлової системи NTFS:", "options": ["інформацію про атрибути файлової системи", "інформація про операції створення (змінення) файлів та каталогів", "інформацію про завантаження.", "інформацію про перелік поганих секторів."], "correctText": "інформація про операції створення (змінення) файлів та каталогів"}, {"question": "Яку інформацію зберігає каталог /usr в ОС Linux:", "options": ["зберігає файли необхідні для завантаження операційної системи", "зберігає всі бінарні файли користувача, їх документації, бібліотеки, налаштування", "зберігає лог файли операційної системи", "зберігає фото та відео користувача"], "correctText": "зберігає всі бінарні файли користувача, їх документації, бібліотеки, налаштування"}, {"question": "Каталог в файловій системі ОС Linux — це:", "options": ["область на диску, в якій зберігаються файли", "файл особливого типу, що містить посилання на інші файли та каталоги", "список підкаталогів наступного рівня вкладеності", "посилання на область диску, де містяться файли"], "correctText": "файл особливого типу, що містить посилання на інші файли та каталоги"}, {"question": "Оберіть інтерфейси можливого підключення жорстких дисків (HDD, SSD) до материнської плати:", "options": ["IDE, SATA, SCSI", "IDE, IEEE, SATA, SAS", "IDE, PCIe, SAS, SATA, SCSI", "IDE, SAS, SATA, SCSI"], "correctText": "IDE, PCIe, SAS, SATA, SCSI"}, {"question": "Вкажіть максимальний розмір файлу у файлові системі FAT32:", "options": ["4 GB", "16 GB", "32 GB", "64 GB"], "correctText": "4 GB"}, {"question": "Оберіть файлові системи, використання яких передбачено в комп’ютерах Apple:", "options": ["HFS, HFS+", "HFS, HFS+, FAT32", "HFS, HFS+, FAT32, exFAT", "HFS, HFS+, FAT32, exFAT, NTFS"], "correctText": "HFS, HFS+, FAT32, exFAT"}, {"question": "Із скількох рівнів складається модель OSI?", "options": ["трьох", "п’ятьох", "сімох", "вісьмох"], "correctText": "сімох"}, {"question": "Яка модель відображує те, як повинні бути організовані комунікаційні функції комп’ютерної мережі?", "options": ["CCITT", "OSI", "ISO", "ANSI"], "correctText": "OSI"}, {"question": "Що таке віртуальна пам'ять?", "options": ["сукупність програмно-апаратних засобів, що надають програмі більший об’єм оперативної пам'яті, ніж фізично встановлено в комп’ютері, за рахунок вільного простору на жорсткому диску", "частина оперативної пам'яті, що виділяється для розміщення драйвера віртуального диска", "компонент ОС, який здійснює кешування інформації, що зберігається на жорсткому диску в оперативну пам'ять", "частина оперативної пам'яті, що виділяється для запуску віртуальної машини"], "correctText": "сукупність програмно-апаратних засобів, що надають програмі більший об’єм оперативної пам'яті, ніж фізично встановлено в комп’ютері, за рахунок вільного простору на жорсткому диску"}, {"question": "Розрядність мікропроцесора - це:", "options": ["найбільша одиниця інформації", "найменша одиниця інформації", "кількість бітів (розрядів), які процесор може обробити за один раз", "ємність оперативної пам’яті з якою може працювати мікропроцесор"], "correctText": "кількість бітів (розрядів), які процесор може обробити за один раз"}, {"question": "Що таке IMEI?", "options": ["фізична адреса мережевої карти", "міжнародний ідентифікатор мобільного обладнання", "програмне забезпечення для копіювання даних з мобільних пристроїв", "стандарт для підключення моніторів"], "correctText": "міжнародний ідентифікатор мобільного обладнання"}, {"question": "Для установки драйвера в ОС Windows користувач повинен увійти в систему:", "options": ["тільки з обліковим записом з ім'ям «Адміністратор»", "використовуючи обліковий запис з обмеженими правами", "з обліковим записом, що має права адміністратора", "з будь-якого облікового запису"], "correctText": "з обліковим записом, що має права адміністратора"}, {"question": "У якому каталозі зберігаються лог-файли операційних систем Windows", "options": ["C:\\Users\\Default\\AppData\\", "%SystemRoot%\\System32\\Winevt\\Logs\\", "C:\\Program Files (x86)\\Common Files\\", "C:\\Windows"], "correctText": "%SystemRoot%\\System32\\Winevt\\Logs\\"}, {"question": "В якому з каталогів операційної системи Linux зберігаються конфігураційні файли більшості системних утиліт та програм?", "options": ["/usr", "/etc", "/opt", "/sbin"], "correctText": "/etc"}, {"question": "За допомогою якої команди можна дізнатись мережеві налаштування в OC Linux?", "options": ["ifconfig", "ipconfig", "ls", "touch"], "correctText": "ifconfig"}, {"question": "Служба DHCP Server відповідає за:", "options": ["віддалену установку драйверів", "захист локальної мережі", "призначення мережевих налаштувань пристроям", "надання загального доступу"], "correctText": "призначення мережевих налаштувань пристроям"}, {"question": "Що означають атрибути файлу  -rwx- у ОС Linux:", "options": ["файл доступний для запису, читання, копіювання", "файл доступний для запису, видалення, читання", "файл доступний для читання, запису, запуску", "файл доступний для запуску, читання, копіювання"], "correctText": "файл доступний для читання, запису, запуску"}, {"question": "SOCKET LGA1155?", "options": ["тип роз'єму відеокарти", "тип роз'єму для процесорів виробництва AMD", "тип роз'єму модуля пам'яті", "тип роз'єму для процесорів виробництва INTEL"], "correctText": "тип роз'єму для процесорів виробництва INTEL"}, {"question": "Чіпсет материнської плати – це:", "options": ["роз’єм для підключення процесора", "набір мікросхем, що розміщується на материнській платі, виконує роль компонента, що пов’язує та забезпечує спільне функціонуванні підсистем пам'яті, центрального процесора, та і ін.", "роз'єм для підключення відеокарти", "можливі варіанти А і В"], "correctText": "набір мікросхем, що розміщується на материнській платі, виконує роль компонента, що пов’язує та забезпечує спільне функціонуванні підсистем пам'яті, центрального процесора, та і ін."}, {"question": "Якою командою можна подивитись список активних процесів у ОС Linux?", "options": ["ls", "ps", "rm", "rd"], "correctText": "ps"}, {"question": "Що з перерахованого нижче не є мовою програмування?", "options": ["PHP", "Apache", "Visual Basic", "всі варіанти є мовами програмування"], "correctText": "Apache"}, {"question": "Як називається система зв’язку між двома чи більшою кількістю комп’ютерів?", "options": ["мобільна мережа", "супутникова мережа", "комп’ютерна мережа", "електрична мережа"], "correctText": "комп’ютерна мережа"}, {"question": "Яка з комп’ютерних мереж найбільша за кількістю комп’ютерів та площею?", "options": ["локальна мережа", "глобальна мережа", "корпоративна мережа", "районна мережа"], "correctText": "глобальна мережа"}, {"question": "Яка з наведених комп’ютерних мереж найменша за кількістю комп’ютерів та площею?", "options": ["локальна мережа", "глобальна мережа", "корпоративна мережа", "районна мережа"], "correctText": "корпоративна мережа"}, {"question": "Для чого потрібна Active Directory?", "options": ["для тестування жорсткого диску", "для одноманітного налаштування робочого середовища користувача на всіх комп’ютерах в мережі", "для тестування комп’ютерної мережі", "для підключення зовнішніх накопичувачів інформації"], "correctText": "для одноманітного налаштування робочого середовища користувача на всіх комп’ютерах в мережі"}, {"question": "Як називається логічна група комп’ютерів однорангової мережі?", "options": ["робоча група", "домен", "обліковий запис користувача", "локальна мережа", "мережна топологія"], "correctText": "робоча група"}, {"question": "Що описує мережевий протокол:", "options": ["правила підключення пристроїв комп’ютера", "правила взаємодії пристроїв комп’ютера", "правила підключення до мережі", "правила взаємодії комп’ютерів у мережі", "правила відключення комп’ютерів від мережі"], "correctText": "правила взаємодії комп’ютерів у мережі"}, {"question": "Одноранговою називають мережу:", "options": ["де всі комп’ютери одинакові по потужності", "де всі комп’ютери рівноправні", "де один комп’ютер головний – сервер, а інші – робочі станції", "де відбувається централізоване управління ресурсами", "прийнятну до великої кількості комп’ютерів"], "correctText": "де всі комп’ютери рівноправні"}, {"question": "Комп’ютерна мережа :", "options": ["це мережа мобільних телефонів", "це мережа стаціонарних телефонів", "служить для зв’язку основних пристроїв комп’ютера", "служить для зв’язку периферійних пристроїв комп’ютера", "система зв’язку між двома чи більшою кількістю комп’ютерів"], "correctText": "система зв’язку між двома чи більшою кількістю комп’ютерів"}, {"question": "Комп'ютерний вірус може бути замаскований під:", "options": ["програми", "графічні файли", "текстові файли", "усі відповіді вірні"], "correctText": "усі відповіді вірні"}, {"question": "Що таке GPT на накопичувачі інформації?", "options": ["файл підкачки операційної системи", "таблиця розділів", "таблиця мережевих адрес", "конфігураційний файл операційної системи"], "correctText": "таблиця розділів"}, {"question": "Які файли можна редагувати за допомогою HEX-редактору", "options": ["графічні файли", "текстові файли", "файли побітових образів накопичувачів інформації (E01,raw)", "всі вищеперераховані"], "correctText": "всі вищеперераховані"}, {"question": "Що таке статичний аналіз шкідливого програмного забезпечення?", "options": ["аналіз при якому виконується запуск шкідливого ПЗ у спеціальному середовищі та вивчається принцип його роботи", "аналіз при якому, одним із методів дослідження є виконання реверс-інжинірингу шкідливого ПЗ та вивчається принцип його роботи по його вихідному коду", "аналіз при якому вивчаються системні файли операційної системи, де виявлено шкідливе ПЗ", "всі вищеперераховані"], "correctText": "аналіз при якому, одним із методів дослідження є виконання реверс-інжинірингу шкідливого ПЗ та вивчається принцип його роботи по його вихідному коду"}, {"question": "Щоб зберегти текстовий файл (документ) у певному форматі необхідно задати?", "options": ["розмір шрифту", "тип файлу", "параметри абзацу", "розміри сторінки"], "correctText": "тип файлу"}, {"question": "Що таке контрольна сума?", "options": ["деяке значення, яке допомагає визначити унікальність файлу", "деяке значення, яке визначає розмір кластеру у файловій системі", "деяке значення, яке допомагає порахувати об’єм файлу", "деяке значення, яке допомагає порахувати дату створення файлу"], "correctText": "деяке значення, яке допомагає визначити унікальність файлу"}, {"question": "Що зберігає SAM файл в ОС Windows?", "options": ["мережеві налаштування", "системні події операційної системи", "паролі користувачів операційної системи", "дані про апаратну частину комп’ютера"], "correctText": "паролі користувачів операційної системи"}, {"question": "В якому з файлі реєстру ОС Windows зберігається інформація про ip адресу мережевого адаптера?", "options": ["SOFTWARE", "SYSTEM", "SAM", "SECURITY"], "correctText": "SYSTEM"}, {"question": "Для того, щоб знайти всі файли з ім'ям , яке складається з трьох символів та розширень txt потрібно в полі «Ім’я файлу або частина імені» ввести:", "options": ["?+/.txt", "*.txt", "?*.txt", "???.txt"], "correctText": "???.txt"}, {"question": "Що таке DNS:", "options": ["система пошуку файлів у OC Windows", "служба, яка відповідає за логування подій в OC Windows", "система, яка співвідносить доменні назви веб-сайтів їх ip-адресам", "мережевий протокол"], "correctText": "система, яка співвідносить доменні назви веб-сайтів їх ip-адресам"}, {"question": "Після відключення живлення комп'ютера втрачаються дані, що містяться:", "options": ["в BIOS", "на flash-накопичувачі", "в оперативній пам'яті", "на жорсткому диску"], "correctText": "в оперативній пам'яті"}, {"question": "Тактова частота - основна характеристика:", "options": ["принтера", "модему", "процесора", "монітору"], "correctText": "процесора"}, {"question": "Що таке Firewall?", "options": ["програмне  (апаратне) забезпечення для створення файл-образу", "програмне (апаратне) забезпечення для копіювання даних з мобільного телефону", "програмне  (апаратне) забезпечення для контролювання, фільтрації, блокування мережевого трафіку", "програмне (апаратне) забезпечення для знищення інформації"], "correctText": "програмне  (апаратне) забезпечення для контролювання, фільтрації, блокування мережевого трафіку"}, {"question": "До домену якого рівня належить веб-сайт mail.test.com:", "options": ["0", "3", "1", "2"], "correctText": "3"}, {"question": "Що таке Cookies?", "options": ["файли з інформацією, які генерує сервер та відправляє веб браузеру", "мережевий протокол", "системні файли файлової системи", "атрибут файлової системи FAT32"], "correctText": "файли з інформацією, які генерує сервер та відправляє веб браузеру"}, {"question": "Що таке регулярний вираз (Regular expression)", "options": ["назва пошукової системи", "послідовність символів, яка визначає пошуковий патерн (шаблон)", "набір файлів користувача", "контрольна сума файлу"], "correctText": "послідовність символів, яка визначає пошуковий патерн (шаблон)"}, {"question": "В яких одиницях вимірюється ємність пам'яті комп'ютера?", "options": ["символ", "біткоін", "літр", "байт, або Кбайт, або Мбайт, або Гбайт"], "correctText": "байт, або Кбайт, або Мбайт, або Гбайт"}, {"question": "Яку інформацію зберігає файл /var/log/auth.log в ОС Linux?", "options": ["інформацію про логування користувачів", "інформацію про системні події", "інформацію про примонтовані пристрої", "інформацію про мережеві підключення"], "correctText": "інформацію про логування користувачів"}, {"question": "Яку інформацію зберігає файл /var/log/dmesg  в ОС Linux?", "options": ["повідомлення про отримані поштові повідомлення", "повідомлення від ядра (модулів) ОС", "інформацію про заплановані задачі", "інформацію про скопійовані файли"], "correctText": "повідомлення від ядра (модулів) ОС"}, {"question": "Який з цих файлів містить інформацію про підключення по RDP в ОС Windows?", "options": ["Microsoft-Windows-NlaSvc%4Operational.evtx", "Microsoft-Windows-Kernel-WDI%4Operational.evtx", "Microsoft-Windows-TerminalServices-LocalSessionManager.evtx", "Microsoft-Windows-Authentication User Interface%4Operational.evtx"], "correctText": "Microsoft-Windows-TerminalServices-LocalSessionManager.evtx"}, {"question": "В якому з цих файлів в ОС Linux зберігаються дані про паролі користувачів?", "options": ["/etc/passwd", "/usr/user/pass", "/usr/sysem/password", "/mnt/kernet/system/passaccount"], "correctText": "/etc/passwd"}, {"question": "Яка з вказаних команд в ОС Linux показує перелік доступних розділів накопичувачів інформації?", "options": ["cp", "ls-l", "fdisk-l", "cat"], "correctText": "fdisk-l"}, {"question": "Що таке WHOIS?", "options": ["протокол запитів та відповідей, який використовуються для отримання інформації про доменні імена, ip-адреси", "протокол, який використовуються для автоматичного призначення мережевих налаштувань", "система логування подій в ОС Linux", "служба роботи з периферійними пристроями"], "correctText": "протокол запитів та відповідей, який використовуються для отримання інформації про доменні імена, ip-адреси"}, {"question": "За допомогою якої з вказаних команд можна зробити побітову копію накопичувача інформації або окремого розділу в ОС Linux?", "options": ["ls", "dd", "mv", "fdisk"], "correctText": "dd"}, {"question": "Для чого потрібен swap розділ в ОС Linux:", "options": ["для зберігання файлів користувача", "для зберігання інформації з оперативної пам’яті", "для зберігання тимчасових файлів", "для зберігання налаштувань операційної системи"], "correctText": "для зберігання інформації з оперативної пам’яті"}, {"question": "Комп'ютерна шина – це:", "options": ["мікросхема на материнській платі", "канал пересилки даних", "роз’єм для підключення процесора", "роз’єм для підключення відеоадаптера"], "correctText": "канал пересилки даних"}, {"question": "Куди зберігається інформація з оперативної пам’яті при переході комп’ютера в режим «Гібірнації» в ОС Windows?", "options": ["у файл hiberfil.sys", "інформація не зберігається", "у файл NTUSER.DAT", "інформація лишається в оперативній пам’яті"], "correctText": "у файл hiberfil.sys"}, {"question": "Що таке RSA, ECC, 3DES, AES?", "options": ["назви операційних систем", "фалові системи", "алгоритми шифрування", "мережеві протоколи"], "correctText": "алгоритми шифрування"}, {"question": "BIOS  - це:", "options": ["програма, яка використовується для ініціалізації, тестування обладнання в процесі завантаження та передачі подальшого завантаження операційній системі", "програма для роботи з а базами даних", "роз’єм для встановлення процесора", "головна мікросхема материнської плати", "північний міст материнської плати"], "correctText": "програма, яка використовується для ініціалізації, тестування обладнання в процесі завантаження та передачі подальшого завантаження операційній системі"}, {"question": "Північний і південний мости – це:", "options": ["роз’єми для підключення процесора та оперативної пам’яті", "шини материнської плати", "роз’єми для підключення оперативної плати та жорсткого диска", "мікросхеми, які складають чіпсет материнської плати", "слоти материнської плати"], "correctText": "мікросхеми, які складають чіпсет материнської плати"}, {"question": "Північний міст материнської плати відповідає за роботу:", "options": ["центрального процесора з оперативною пам’яттю та відеоадаптером", "накопичувачів інформації між собою", "периферійних пристроїв", "монітору"], "correctText": "центрального процесора з оперативною пам’яттю та відеоадаптером"}, {"question": "Тактова частота процесора вимірюється в:", "options": ["кодах таблиці символів", "герцах", "байтах і бітах", "паскалях"], "correctText": "герцах"}, {"question": "За що відповідає сесійний (5 рівень) моделі OSI?", "options": ["встановлення, взаємодію та завершення зв’язку між додатками", "визначення шляху передачі даних", "отримання додатком доступу до мережевих сервісів", "передачу даних"], "correctText": "встановлення, взаємодію та завершення зв’язку між додатками"}, {"question": "Що таке FileVault?", "options": ["програма для створення користувачів в ОС Linux", "служба, яка відповідає за друк в ОС Wіndows", "програма для шифрування інформації в ОС MacOS", "програма для підбору паролів"], "correctText": "програма для шифрування інформації в ОС MacOS"}, {"question": "Для чого призначенні файли з розширеннями ost,pst?", "options": ["для зберігання конфігураційних файлів ОС Windows", "для зберігання інформації (електронного листування) у ПЗ Outlook", "для зберігання паролів у OC Linux", "для зберігання ключів шифрування"], "correctText": "для зберігання інформації (електронного листування) у ПЗ Outlook"}, {"question": "Для чого потрібен pagefile.sys?", "options": ["для зберігання останніх відкритих файлів користувача", "для роботі периферійних пристроїв", "для часткового зберігання даних з оперативної пам’яті", "для роботи клавіатури"], "correctText": "для часткового зберігання даних з оперативної пам’яті"}, {"question": "Що з нижче перерахованого не є MAC-адресою?", "options": ["09-12-E7-72-A3-47", "3B-5Z-8C-K9-35-01", "B9-38-54-DF-0D-41", "D6-0D-C5-73-19-A8"], "correctText": "3B-5Z-8C-K9-35-01"}, {"question": "Диски типу CD-R, CD-RW, DVD-R, DVD-RW використовують файлову систему:", "options": ["FAT16", "FAT32", "NTFS", "UDF"], "correctText": "UDF"}, {"question": "Шо відображає Timeline операційної системи Windows 10?", "options": ["перелік паролів", "історію активностей", "перелік користувачів", "час та дату"], "correctText": "історію активностей"}, {"question": "Для чого потрібні Prefetch файли в ОС Windows?", "options": ["для перегляду переліку користувачів в операційній системі", "для прискорення процесу запуску програм", "для реєстрації системних подій в операційній системі", "для запису історії відвідування веб-ресурсів"], "correctText": "для прискорення процесу запуску програм"}, {"question": "Для чого потрібні файли з розширенням LNK?", "options": ["для відкриття файлів Microsoft Office", "для швидкого доступу до визначеної  адреси у оперативної пам’яті", "для швидкого доступу до визначеного файлу", "для форматування диску С"], "correctText": "для швидкого доступу до визначеного файлу"}, {"question": "Що таке Brute Force?", "options": ["тип атаки для підбору паролю шляхом послідовному перебору окремих символів у визначеному діапазоні", "тип атаки для підбору паролю шлях перебору окремих символів, слів та словосполучень, які заздалегідь визначені у файлі-словнику", "тип атаки для перенаправлення мережевого трафіку", "тип атаки для підбору назви користувача операційної системи"], "correctText": "тип атаки для підбору паролю шляхом послідовному перебору окремих символів у визначеному діапазоні"}, {"question": "Що таке DDoS атака?", "options": ["атака, при якій виконується видалення системних файлів", "атака призначена для підбору паролю користувача", "атака, при якій за визначений проміжок часу направляється велика кількість мережевих пакетів", "атака призначена для перенаправлення мережевого трафіку"], "correctText": "атака, при якій за визначений проміжок часу направляється велика кількість мережевих пакетів"}, {"question": "Для чого потрібен SSL сертифікат?", "options": ["для встановлення логіну та паролю до веб-ресурсі", "для встановлення автентичності користувача", "для встановлення автентичності веб-ресурсу", "для налаштування принтера"], "correctText": "для встановлення автентичності веб-ресурсу"}];
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const NUM_QUESTIONS = 50;
+let session = [];
+let currentIndex = 0;
+let selectedOption = null;
+let correctCount = 0;
+let answers = [];
+
+const screenIntro = document.getElementById('screenIntro');
+const screenQuiz = document.getElementById('screenQuiz');
+const screenResult = document.getElementById('screenResult');
+const screenName = document.getElementById('screenName');
+const btnStart = document.getElementById('btnStart');
+const btnNext = document.getElementById('btnNext');
+const btnFinishEarly = document.getElementById('btnFinishEarly');
+const btnSkip = document.getElementById('btnSkip');
+const btnRestart = document.getElementById('btnRestart');
+const topStatus = document.getElementById('topStatus');
+const btnNameNext = document.getElementById('btnNameNext');
+const nameInput = document.getElementById('nameInput');
+const nameError = document.getElementById('nameError');
+let participantName = '';
+
+function confirmName() {
+  const val = nameInput.value.trim();
+  if (!val) {
+    nameError.style.display = 'block';
+    nameInput.focus();
+    return;
+  }
+  nameError.style.display = 'none';
+  participantName = val;
+  screenName.classList.add('hidden');
+  screenIntro.classList.remove('hidden');
+}
+
+btnNameNext.addEventListener('click', confirmName);
+nameInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') confirmName();
+});
+
+function buildSession() {
+  const picked = shuffle(BANK).slice(0, NUM_QUESTIONS);
+  session = picked.map(q => {
+    const opts = shuffle(q.options);
+    return { question: q.question, options: opts, correctText: q.correctText };
+  });
+  currentIndex = 0;
+  correctCount = 0;
+  answers = new Array(NUM_QUESTIONS).fill(undefined);
+}
+
+const TIME_LIMIT_SECONDS = 30 * 60;
+let timerInterval = null;
+let timeRemaining = TIME_LIMIT_SECONDS;
+let timeExpired = false;
+let finishedEarly = false;
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timeRemaining = TIME_LIMIT_SECONDS;
+  timeExpired = false;
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    timeRemaining--;
+    if (timeRemaining <= 0) {
+      timeRemaining = 0;
+      updateTimerDisplay();
+      clearInterval(timerInterval);
+      timeExpired = true;
+      handleTimeUp();
+    } else {
+      updateTimerDisplay();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('timerDisplay');
+  if (!el) return;
+  const m = Math.floor(timeRemaining / 60);
+  const s = timeRemaining % 60;
+  el.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+  if (timeRemaining <= 60) {
+    el.style.color = 'var(--danger)';
+  } else if (timeRemaining <= 300) {
+    el.style.color = '#e0b84f';
+  } else {
+    el.style.color = 'var(--teal)';
+  }
+}
+
+function handleTimeUp() {
+  // Питання, на яке не встигли відповісти чи підтвердити, зараховується як невірне
+  showResult();
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+}
+
+function startQuiz() {
+  buildSession();
+  finishedEarly = false;
+  timeExpired = false;
+  screenIntro.classList.add('hidden');
+  screenResult.classList.add('hidden');
+  screenQuiz.classList.remove('hidden');
+  topStatus.textContent = participantName + ' · ' + NUM_QUESTIONS + ' питань';
+  renderQuestion();
+  startTimer();
+}
+
+function countUnresolved(excludeIndex) {
+  let n = 0;
+  for (let i = 0; i < NUM_QUESTIONS; i++) {
+    if (i === excludeIndex) continue;
+    if (answers[i] === undefined || answers[i] === null) n++;
+  }
+  return n;
+}
+
+function countSkipped() {
+  return answers.filter(a => a === null).length;
+}
+
+function renderQuestion() {
+  selectedOption = null;
+  btnNext.disabled = true;
+  const q = session[currentIndex];
+  const wasSkipped = answers[currentIndex] === null;
+  document.getElementById('qNum').textContent = 'ПИТАННЯ ' + (currentIndex + 1) + ' З ' + NUM_QUESTIONS +
+    (wasSkipped ? '  ·  раніше пропущено' : '');
+  document.getElementById('qText').textContent = q.question;
+  const optWrap = document.getElementById('qOptions');
+  optWrap.innerHTML = '';
+  q.options.forEach((optText, idx) => {
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.innerHTML = '<div class="marker"></div><div>' + escapeHtml(optText) + '</div>';
+    div.addEventListener('click', () => selectOption(idx, div));
+    optWrap.appendChild(div);
+  });
+  const resolvedCount = answers.filter(a => a !== undefined).length;
+  document.getElementById('progressCount').textContent = 'Опрацьовано: ' + resolvedCount + ' / ' + NUM_QUESTIONS;
+  document.getElementById('progressFill').style.width = (resolvedCount / NUM_QUESTIONS * 100) + '%';
+  const skipCountEl = document.getElementById('skipCount');
+  const skipped = countSkipped();
+  if (skipped > 0) {
+    skipCountEl.style.display = '';
+    skipCountEl.textContent = 'Пропущено: ' + skipped;
+  } else {
+    skipCountEl.style.display = 'none';
+  }
+  const isLast = countUnresolved(currentIndex) === 0;
+  btnNext.textContent = isLast ? 'Завершити' : 'Далі';
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function findNextIndex() {
+  for (let step = 1; step <= NUM_QUESTIONS; step++) {
+    const idx = (currentIndex + step) % NUM_QUESTIONS;
+    if (answers[idx] === undefined) return idx;
+  }
+  for (let idx = 0; idx < NUM_QUESTIONS; idx++) {
+    if (answers[idx] === null) return idx;
+  }
+  return -1;
+}
+
+function selectOption(idx, el) {
+  const optWrap = document.getElementById('qOptions');
+  Array.from(optWrap.children).forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedOption = idx;
+  btnNext.disabled = false;
+}
+
+function nextQuestion() {
+  answers[currentIndex] = selectedOption;
+  const idx = findNextIndex();
+  if (idx === -1) {
+    showResult();
+  } else {
+    currentIndex = idx;
+    renderQuestion();
+  }
+}
+
+function skipQuestion() {
+  answers[currentIndex] = null;
+  const idx = findNextIndex();
+  if (idx === -1) {
+    showResult();
+  } else {
+    currentIndex = idx;
+    renderQuestion();
+  }
+}
+
+async function showResult() {
+  stopTimer();
+  correctCount = 0;
+  for (let i = 0; i < NUM_QUESTIONS; i++) {
+    const a = answers[i];
+    if (typeof a === 'number') {
+      const q = session[i];
+      if (q.options[a] === q.correctText) correctCount++;
+    }
+  }
+  document.getElementById('progressFill').style.width = '100%';
+  screenQuiz.classList.add('hidden');
+  screenResult.classList.remove('hidden');
+  let noteSuffix = '';
+  if (timeExpired) noteSuffix = ' · час вийшов';
+  else if (finishedEarly) noteSuffix = ' · завершено достроково';
+  document.getElementById('resName').textContent = participantName + noteSuffix;
+  const pct = Math.round((correctCount / NUM_QUESTIONS) * 100);
+  const scoreEl = document.getElementById('resScore');
+  scoreEl.textContent = correctCount + '/' + NUM_QUESTIONS;
+  const pctEl = document.getElementById('resPct');
+  pctEl.textContent = pct + '%';
+  const verdictEl = document.getElementById('resVerdict');
+  scoreEl.classList.remove('ok', 'mid', 'bad');
+  if (pct >= 80) {
+    scoreEl.classList.add('ok');
+    verdictEl.textContent = 'Відмінний результат';
+    verdictEl.style.color = 'var(--ok)';
+  } else if (pct >= 60) {
+    scoreEl.classList.add('mid');
+    verdictEl.textContent = 'Непоганий результат, є що підтягнути';
+    verdictEl.style.color = '#e0b84f';
+  } else {
+    scoreEl.classList.add('bad');
+    verdictEl.textContent = 'Варто повторити матеріал';
+    verdictEl.style.color = 'var(--danger)';
+  }
+  await saveResult(participantName, correctCount, NUM_QUESTIONS, pct);
+}
+
+// ==== НАЛАШТУВАННЯ GOOGLE ТАБЛИЦІ ====
+// Вставте сюди URL вашого розгорнутого Google Apps Script (Web App).
+// Інструкція, як його отримати — в описі нижче чату.
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxn5x3Tq1ivKLQr6h8ACKvCbkTxXVvhfBe2LSgvJvjXrdA5TMXXH5QeQrpL08rYhQegJg/exec';
+
+async function saveResult(name, score, total, pct) {
+  const key = 'results:' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+  const record = {
+    name: name,
+    score: score,
+    total: total,
+    pct: pct,
+    date: new Date().toISOString()
+  };
+  // Локальне сховище (працює лише всередині артефакту Claude)
+  try {
+    if (window.storage) {
+      await window.storage.set(key, JSON.stringify(record), true);
+    }
+  } catch (e) {
+    console.error('Не вдалося зберегти результат локально:', e);
+  }
+  // Відправка у Google Таблицю (працює будь-де, де відкрита сторінка)
+  try {
+    if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.indexOf('http') === 0) {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(record)
+      });
+    }
+  } catch (e) {
+    console.error('Не вдалося відправити результат у Google Таблицю:', e);
+  }
+}
+
+btnStart.addEventListener('click', startQuiz);
+btnNext.addEventListener('click', nextQuestion);
+btnSkip.addEventListener('click', skipQuestion);
+btnFinishEarly.addEventListener('click', () => {
+  const answeredCount = answers.filter(a => typeof a === 'number').length;
+  const confirmMsg = 'Ви впевнені, що хочете завершити тестування достроково?\n' +
+    'Буде враховано тільки ' + answeredCount + ' із ' + NUM_QUESTIONS + ' підтверджених відповідей, решта — як невірні.';
+  if (window.confirm(confirmMsg)) {
+    finishedEarly = true;
+    showResult();
+  }
+});
+btnRestart.addEventListener('click', startQuiz);
+
+const ADMIN_PASSWORD = 'kte2026';
+
+const screenAdmin = document.getElementById('screenAdmin');
+const screenAdminAuth = document.getElementById('screenAdminAuth');
+const adminLink = document.getElementById('adminLink');
+const adminClose = document.getElementById('adminClose');
+const adminList = document.getElementById('adminList');
+const adminEmpty = document.getElementById('adminEmpty');
+const adminPassInput = document.getElementById('adminPassInput');
+const adminPassError = document.getElementById('adminPassError');
+const adminAuthSubmit = document.getElementById('adminAuthSubmit');
+const adminAuthCancel = document.getElementById('adminAuthCancel');
+
+adminLink.addEventListener('click', async (e) => {
+  e.preventDefault();
+  hiddenBeforeAdmin = [screenName, screenIntro, screenQuiz, screenResult].filter(el => !el.classList.contains('hidden'));
+  hiddenBeforeAdmin.forEach(el => el.classList.add('hidden'));
+  screenAdminAuth.classList.remove('hidden');
+  adminPassInput.value = '';
+  adminPassError.style.display = 'none';
+  adminPassInput.focus();
+});
+
+function checkAdminPassword() {
+  if (adminPassInput.value === ADMIN_PASSWORD) {
+    adminPassError.style.display = 'none';
+    screenAdminAuth.classList.add('hidden');
+    openAdmin();
+  } else {
+    adminPassError.style.display = 'block';
+    adminPassInput.value = '';
+    adminPassInput.focus();
+  }
+}
+
+adminAuthSubmit.addEventListener('click', checkAdminPassword);
+adminPassInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') checkAdminPassword();
+});
+adminAuthCancel.addEventListener('click', (e) => {
+  e.preventDefault();
+  screenAdminAuth.classList.add('hidden');
+  restoreAfterAdmin();
+});
+adminClose.addEventListener('click', (e) => {
+  e.preventDefault();
+  restoreAfterAdmin();
+});
+
+let hiddenBeforeAdmin = [];
+
+async function openAdmin() {
+  screenAdmin.classList.remove('hidden');
+  adminList.innerHTML = '<div style="color:var(--text-dim); font-size:14px;">Завантаження…</div>';
+  adminEmpty.classList.add('hidden');
+
+  let records = [];
+  // Джерело 1: локальне сховище Claude (доступне лише всередині артефакту)
+  try {
+    if (window.storage) {
+      const listRes = await window.storage.list('results:', true);
+      const keys = (listRes && listRes.keys) ? listRes.keys : [];
+      for (const k of keys) {
+        try {
+          const item = await window.storage.get(k, true);
+          if (item && item.value) {
+            records.push(JSON.parse(item.value));
+          }
+        } catch (err) {
+          // skip unreadable record
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Не вдалося завантажити результати з локального сховища:', e);
+  }
+
+  // Джерело 2: Google Таблиця (доступне незалежно від того, де відкрита сторінка)
+  try {
+    if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.indexOf('http') === 0) {
+      const resp = await fetch(GOOGLE_SCRIPT_URL, { method: 'GET' });
+      if (resp.ok) {
+        const sheetRecords = await resp.json();
+        if (Array.isArray(sheetRecords)) {
+          records = records.concat(sheetRecords);
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Не вдалося завантажити результати з Google Таблиці:', e);
+  }
+
+  // прибрати можливі дублікати (та ж особа, той же час)
+  const seen = new Set();
+  records = records.filter(r => {
+    const sig = r.name + '|' + r.date + '|' + r.score;
+    if (seen.has(sig)) return false;
+    seen.add(sig);
+    return true;
+  });
+
+  records.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  adminList.innerHTML = '';
+  if (records.length === 0) {
+    adminEmpty.classList.remove('hidden');
+    return;
+  }
+  records.forEach(r => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:12px 14px; background:var(--panel-2); border:1px solid var(--border); border-radius:7px; font-size:14px;';
+    const dt = new Date(r.date);
+    const dateStr = dt.toLocaleDateString('uk-UA') + ' ' + dt.toLocaleTimeString('uk-UA', {hour:'2-digit', minute:'2-digit'});
+    let color = 'var(--danger)';
+    if (r.pct >= 80) color = 'var(--ok)';
+    else if (r.pct >= 60) color = '#e0b84f';
+    row.innerHTML =
+      '<div><div style="font-weight:600;">' + escapeHtml(r.name) + '</div>' +
+      '<div style="color:var(--text-dim); font-size:12px; margin-top:2px;">' + dateStr + '</div></div>' +
+      '<div style="font-family:SFMono-Regular,Consolas,monospace; font-weight:700; color:' + color + ';">' +
+      r.score + '/' + r.total + ' · ' + r.pct + '%</div>';
+    adminList.appendChild(row);
+  });
+}
+
+function restoreAfterAdmin() {
+  screenAdmin.classList.add('hidden');
+  if (hiddenBeforeAdmin.length) {
+    hiddenBeforeAdmin.forEach(el => el.classList.remove('hidden'));
+  } else {
+    screenName.classList.remove('hidden');
+  }
+}
+</script>
+</body>
+</html>
